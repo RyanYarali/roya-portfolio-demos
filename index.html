@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Roya — Portfolio Demos</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0b0d14; --card:#141824; --line:#232a3b; --ink:#eef1f8; --mute:#8b93a7; --acc:#7cc4ff; }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:400 16px/1.55 Inter, system-ui, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 56px 16px 80px; }
+  .eyebrow { color: var(--acc); font-weight: 600; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
+  h1 { font-size: clamp(34px, 9vw, 56px); line-height: 1.02; margin: 10px 0 14px; letter-spacing: -.03em; }
+  h2 { font-size: 22px; margin: 56px 0 6px; letter-spacing: -.01em; }
+  .lead { color: var(--mute); margin: 0 0 28px; max-width: 52ch; }
+  .steps { display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 8px; }
+  .steps b { font-size: 13px; padding: 6px 12px; border-radius: 999px; background: var(--card); border:1px solid var(--line); font-weight:600; }
+
+  .demos { display: grid; gap: 14px; margin-top: 18px; }
+  .demo { position: relative; display: grid; grid-template-columns: 92px 1fr; gap: 16px; align-items: center;
+    padding: 16px; border-radius: 20px; background: var(--card); border: 1px solid var(--line);
+    color: inherit; text-decoration: none; overflow: hidden;
+    transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s; opacity: 0; transform: translateY(18px); }
+  .demo.in { opacity: 1; transform: none; transition: opacity .6s, transform .6s cubic-bezier(.2,.8,.2,1), border-color .3s; }
+  .demo:active { transform: scale(.98); }
+  @media (hover:hover) { .demo:hover { border-color: var(--c); transform: translateY(-3px); } }
+  .demo .thumb { width: 92px; height: 92px; border-radius: 16px; display:grid; place-items:center; font-weight:800; font-size: 34px; color:#0b0d14; background: var(--c); }
+  .demo h3 { margin: 0 0 2px; font-size: 18px; }
+  .demo p { margin: 0; color: var(--mute); font-size: 14px; }
+  .demo .go { color: var(--c); font-weight: 600; font-size: 14px; margin-top: 6px; display:inline-block; }
+
+  form { margin-top: 18px; display: grid; gap: 26px; }
+  fieldset { border: 0; padding: 0; margin: 0; }
+  legend { font-weight: 600; margin-bottom: 10px; }
+  legend small { color: var(--mute); font-weight: 400; }
+  .chips { display:flex; flex-wrap: wrap; gap: 8px; }
+  .chips label { cursor: pointer; }
+  .chips input { position:absolute; opacity:0; pointer-events:none; }
+  .chips span { display:inline-flex; align-items:center; gap:8px; min-height: 44px; padding: 10px 16px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: 15px; transition: background .2s, border-color .2s, transform .15s; }
+  .chips label:active span { transform: scale(.96); }
+  .chips input:checked + span { border-color: var(--acc); background: #16263a; }
+  .chips input:focus-visible + span { outline: 2px solid var(--acc); outline-offset: 2px; }
+  .dot { width: 16px; height: 16px; border-radius: 50%; background: var(--d); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
+  textarea, input[type=text], input[type=email] { width: 100%; padding: 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; resize: vertical; }
+  textarea:focus, input[type=text]:focus, input[type=email]:focus { outline: 2px solid var(--acc); outline-offset: 1px; }
+  .send { display:flex; gap:10px; flex-wrap: wrap; }
+  button { font: 700 16px Inter, sans-serif; min-height: 52px; padding: 0 22px; border-radius: 999px; border: 0; cursor: pointer; }
+  .primary { background: var(--acc); color: #0b0d14; flex: 1 1 220px; }
+  .ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); flex: 1 1 140px; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 40px); opacity: 0; background: #fff; color: #0b0d14; padding: 12px 18px; border-radius: 999px; font-weight: 600; font-size: 14px; transition: .35s cubic-bezier(.2,.8,.2,1); pointer-events: none; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .send-files { padding: 16px 18px; border-radius: 16px; background: var(--card); border: 1px dashed var(--acc); }
+  .send-files ul { margin: 8px 0 0; padding-left: 20px; color: var(--mute); font-size: 15px; }
+  .send-files li + li { margin-top: 4px; }
+  footer { margin-top: 48px; color: var(--mute); font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Portfolio demos · for Roya Yarali</div>
+  <h1>Hey Roya 👋<br>Pick your vibe.</h1>
+  <p class="lead">These are three quick <b>style previews</b>, not finished sites. Each one shows the opening screen and one section. Open them on your phone, play with them, then answer the questions below. It takes about 2 minutes.</p>
+  <div class="steps"><b>1 · Try the demos</b><b>2 · Pick a style</b><b>3 · A few facts</b><b>4 · Send</b></div>
+
+  <div class="demos">
+    <a class="demo" href="a/" style="--c:#38e1ff">
+      <div class="thumb">A</div>
+      <div><h3>SOC Console</h3><p>Dark analyst dashboard. Your projects are cases in an alert queue: tap one to triage it.</p><span class="go">Open demo A →</span></div>
+    </a>
+    <a class="demo" href="b/" style="--c:#e0a12a">
+      <div class="thumb">B</div>
+      <div><h3>Case File</h3><p>Light, forensic-report style. Verify the evidence hash, then scroll your career as a rebuilt timeline.</p><span class="go">Open demo B →</span></div>
+    </a>
+    <a class="demo" href="c/" style="--c:#7c6cff">
+      <div class="thumb">C</div>
+      <div><h3>Bold Minimal</h3><p>Big type, smooth scroll effects and your labs shown on swipeable phones.</p><span class="go">Open demo C →</span></div>
+    </a>
+  </div>
+
+  <h2>Part 1 · Your style</h2>
+  <p class="lead" style="margin-bottom:0">Just tap. Colors in the demos are placeholders, so pick the ones you actually like.</p>
+
+  <form id="q">
+    <fieldset>
+      <legend>1. Which demo do you like most?</legend>
+      <div class="chips">
+        <label><input type="radio" name="style" value="A · SOC Console"><span>A · SOC Console</span></label>
+        <label><input type="radio" name="style" value="B · Case File"><span>B · Case File</span></label>
+        <label><input type="radio" name="style" value="C · Bold Minimal"><span>C · Bold Minimal</span></label>
+        <label><input type="radio" name="style" value="Mix (see notes)"><span>Mix of them</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>2. Dark or light?</legend>
+      <div class="chips">
+        <label><input type="radio" name="mode" value="Dark"><span>🌙 Dark</span></label>
+        <label><input type="radio" name="mode" value="Light"><span>☀️ Light</span></label>
+        <label><input type="radio" name="mode" value="Both (toggle)"><span>Both, with a toggle</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>3. Main color? <small>(pick up to 2)</small></legend>
+      <div class="chips" id="colors">
+        <label><input type="checkbox" name="color" value="Cyan / ice blue"><span><i class="dot" style="--d:#38e1ff"></i>Cyan</span></label>
+        <label><input type="checkbox" name="color" value="Blue"><span><i class="dot" style="--d:#3b82f6"></i>Blue</span></label>
+        <label><input type="checkbox" name="color" value="Gold"><span><i class="dot" style="--d:#f2c811"></i>Gold</span></label>
+        <label><input type="checkbox" name="color" value="Green"><span><i class="dot" style="--d:#22c55e"></i>Green</span></label>
+        <label><input type="checkbox" name="color" value="Orange"><span><i class="dot" style="--d:#ff7a59"></i>Orange</span></label>
+        <label><input type="checkbox" name="color" value="Purple"><span><i class="dot" style="--d:#8b5cf6"></i>Purple</span></label>
+        <label><input type="checkbox" name="color" value="Red"><span><i class="dot" style="--d:#ef4444"></i>Red</span></label>
+        <label><input type="checkbox" name="color" value="Black & white"><span><i class="dot" style="--d:linear-gradient(90deg,#000 50%,#fff 50%)"></i>Black & white</span></label>
+        <label><input type="checkbox" name="color" value="Designer's choice"><span>You choose</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>4. Anything else? <small>(optional)</small></legend>
+      <textarea name="notes" rows="3" placeholder="e.g. a site you like, something to add or leave out…"></textarea>
+    </fieldset>
+
+    <h2 style="margin-top:30px">Part 2 · A few facts about you</h2>
+    <p class="lead" style="margin:-14px 0 0">I built the demos from your LinkedIn. These answers fill the gaps so nothing on your site is a guess. Skip anything you're not sure about.</p>
+
+    <fieldset>
+      <legend>5. Which job are you aiming for first?</legend>
+      <div class="chips">
+        <label><input type="radio" name="target" value="SOC analyst"><span>SOC analyst</span></label>
+        <label><input type="radio" name="target" value="Digital forensics / DFIR"><span>Digital forensics (DFIR)</span></label>
+        <label><input type="radio" name="target" value="Cloud / DevOps"><span>Cloud / DevOps</span></label>
+        <label><input type="radio" name="target" value="Any security role"><span>Any security role</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>6. What are you open to?</legend>
+      <div class="chips">
+        <label><input type="checkbox" name="open" value="Co-op / internship"><span>Co-op / internship</span></label>
+        <label><input type="checkbox" name="open" value="Part-time"><span>Part-time</span></label>
+        <label><input type="checkbox" name="open" value="Full-time"><span>Full-time</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>7. When do you finish at BCIT? <small>(month and year)</small></legend>
+      <input type="text" name="grad" placeholder="e.g. June 2027" autocomplete="off">
+    </fieldset>
+
+    <fieldset>
+      <legend>8. University of Isfahan (2009–2013): which degree was it?</legend>
+      <div class="chips">
+        <label><input type="radio" name="isfahan" value="Bachelor's"><span>Bachelor's</span></label>
+        <label><input type="radio" name="isfahan" value="Master's"><span>Master's</span></label>
+        <label><input type="radio" name="isfahan" value="Other (see notes)"><span>Other</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>9. Your AWS post links to finotech.ca. Can I show it on your site?</legend>
+      <div class="chips">
+        <label><input type="radio" name="finotech" value="Yes, show it"><span>Yes, show it</span></label>
+        <label><input type="radio" name="finotech" value="No, leave it out"><span>No, leave it out</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>10. Any certifications, or ones you're studying for?</legend>
+      <input type="text" name="certs" placeholder="e.g. Security+, or none yet" autocomplete="off">
+    </fieldset>
+
+    <fieldset>
+      <legend>11. Profiles to link <small>(GitHub, CyberDefenders, TryHackMe, Hack The Box…)</small></legend>
+      <textarea name="links" rows="2" placeholder="Paste links here"></textarea>
+    </fieldset>
+
+    <fieldset>
+      <legend>12. Which email should the contact button use?</legend>
+      <input type="email" name="email" placeholder="you@example.com" autocomplete="email">
+    </fieldset>
+
+    <div class="send-files">
+      <b>📎 Please also reply to Ryan's email with:</b>
+      <ul>
+        <li>Your résumé (PDF)</li>
+        <li>A photo of you (your LinkedIn photo is great, just send the original)</li>
+        <li>Screenshots from your labs: Autopsy, Wireshark, your nftables rules (blur anything private)</li>
+        <li>Your forensics report, if you're OK sharing it</li>
+      </ul>
+    </div>
+
+    <div class="send">
+      <button type="submit" class="primary">Email my answers to Ryan</button>
+      <button type="button" class="ghost" id="tg">Send on Telegram</button>
+      <button type="button" class="ghost" id="copy">Copy answers</button>
+    </div>
+  </form>
+
+  <footer>Preview only · built by Ryan Yarali</footer>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+  // Fade cards in one after another
+  document.querySelectorAll('.demo').forEach((el, i) => setTimeout(() => el.classList.add('in'), 120 + i * 110));
+
+  const form = document.getElementById('q');
+  const toast = document.getElementById('toast');
+  const say = (msg) => { toast.textContent = msg; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2200); };
+
+  // Max 2 colors
+  document.getElementById('colors').addEventListener('change', (e) => {
+    const on = form.querySelectorAll('input[name=color]:checked');
+    if (on.length > 2) { e.target.checked = false; say('Pick up to 2 colors'); }
+  });
+
+  function answers() {
+    const d = new FormData(form);
+    const v = (k) => ((d.get(k) || '').trim() || '-');
+    const many = (k) => (d.getAll(k).length ? d.getAll(k).join(', ') : '-');
+    return [
+      'Roya · portfolio answers',
+      'Style: ' + v('style'),
+      'Mode: ' + v('mode'),
+      'Colors: ' + many('color'),
+      'Notes: ' + v('notes'),
+      '',
+      'Target job: ' + v('target'),
+      'Open to: ' + many('open'),
+      'Finish BCIT: ' + v('grad'),
+      'Isfahan degree: ' + v('isfahan'),
+      'finotech.ca: ' + v('finotech'),
+      'Certifications: ' + v('certs'),
+      'Profiles: ' + v('links'),
+      'Contact email: ' + v('email'),
+    ].join('\n');
+  }
+  async function copy() {
+    try { await navigator.clipboard.writeText(answers()); say('Copied! Paste it to Ryan'); }
+    catch { prompt('Copy this and send it to Ryan:', answers()); }
+  }
+  const ready = () => { if (!new FormData(form).get('style')) { say('Pick a demo first (question 1)'); return false; } return true; };
+  document.getElementById('copy').addEventListener('click', copy);
+  document.getElementById('tg').addEventListener('click', () => {
+    if (!ready()) return;
+    window.location.href = 'https://t.me/share/url?url=' + encodeURIComponent(location.href) + '&text=' + encodeURIComponent('\n' + answers());
+  });
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!ready()) return;
+    window.location.href = 'mailto:ryan@ryanyarali.com?subject=' + encodeURIComponent('Portfolio answers · Roya') + '&body=' + encodeURIComponent(answers());
+  });
+</script>
+</body>
+</html>

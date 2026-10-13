@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Demo A — SOC Console</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#060a12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/demo.css">
+<style>
+  :root { --bg:#060a12; --panel:#0c1320; --line:#1a2638; --ink:#e6eef8; --mute:#7f8ea6; --acc:#38e1ff;
+    --crit:#ff4d6a; --high:#ffa94d; --med:#ffd84d; --low:#4dd6a0; --demo-cta-bg:#38e1ff; --demo-cta-ink:#04121a; }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 Inter, system-ui, sans-serif; overflow-x: hidden; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+
+  /* Hero */
+  .hero { position: relative; overflow: clip; padding: 64px 16px 28px; min-height: 100svh; display: flex; flex-direction: column; }
+  .grid { position: absolute; inset: 0; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 32px 32px; opacity: .35; mask-image: radial-gradient(ellipse at 50% 30%, #000 20%, transparent 75%); }
+  .scan { position: absolute; left: 0; right: 0; height: 120px; top: -120px; background: linear-gradient(to bottom, transparent, rgba(56,225,255,.08), transparent); animation: scan 6s linear infinite; }
+  @keyframes scan { to { transform: translateY(calc(100svh + 120px)); } }
+  .bar { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 10px; font: 600 11px "JetBrains Mono", monospace; color: var(--mute); letter-spacing: .06em; text-transform: uppercase; }
+  .live { display: inline-flex; align-items: center; gap: 6px; color: var(--low); }
+  .live i { width: 7px; height: 7px; border-radius: 50%; background: var(--low); box-shadow: 0 0 0 0 rgba(77,214,160,.6); animation: ping 1.8s infinite; }
+  @keyframes ping { 70% { box-shadow: 0 0 0 8px rgba(77,214,160,0); } 100% { box-shadow: 0 0 0 0 rgba(77,214,160,0); } }
+
+  .id { position: relative; margin-top: auto; padding-top: 40px; }
+  .tag { display: inline-block; font: 600 11px "JetBrains Mono", monospace; color: var(--acc); border: 1px solid rgba(56,225,255,.35); padding: 5px 9px; border-radius: 6px; letter-spacing: .08em; }
+  h1 { margin: 14px 0 8px; font: 800 clamp(44px, 13vw, 96px)/.95 Inter, sans-serif; letter-spacing: -.045em; }
+  h1 .caret { display: inline-block; width: .08em; height: .8em; background: var(--acc); margin-left: .06em; vertical-align: -.02em; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .role { margin: 0; color: var(--mute); font-size: 16px; max-width: 34ch; opacity: 0; animation: fade .8s 1.4s forwards; }
+  .role b { color: var(--ink); font-weight: 600; }
+  @keyframes fade { to { opacity: 1; } }
+
+  .tiles { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 26px; }
+  .tile { background: rgba(12,19,32,.85); border: 1px solid var(--line); border-radius: 14px; padding: 14px; opacity: 0; transform: translateY(14px); animation: rise .7s cubic-bezier(.2,.8,.2,1) forwards; }
+  .tile:nth-child(1) { animation-delay: 1.6s; } .tile:nth-child(2) { animation-delay: 1.7s; } .tile:nth-child(3) { animation-delay: 1.8s; } .tile:nth-child(4) { animation-delay: 1.9s; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  .tile b { display: block; font: 600 30px/1 "JetBrains Mono", monospace; color: var(--acc); }
+  .tile span { display: block; margin-top: 8px; font-size: 12px; color: var(--mute); line-height: 1.35; }
+  @media (min-width: 760px) { .hero { padding: 80px 40px 40px; } .tiles { grid-template-columns: repeat(4, 1fr); max-width: 900px; } }
+
+  /* Alert queue */
+  .queue { max-width: 900px; margin: 0 auto; padding: 70px 16px 30px; }
+  .qhead { display: flex; justify-content: space-between; align-items: end; gap: 12px; margin-bottom: 14px; }
+  .qhead h2 { margin: 0; font: 800 28px/1.1 Inter, sans-serif; letter-spacing: -.02em; }
+  .qhead small { font: 600 11px "JetBrains Mono", monospace; color: var(--mute); }
+  .filters { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; margin-bottom: 14px; }
+  .filters::-webkit-scrollbar { display: none; }
+  .filters button { flex: none; font: 600 13px Inter, sans-serif; color: var(--mute); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; min-height: 40px; padding: 0 14px; cursor: pointer; transition: color .2s, border-color .2s, background .2s; }
+  .filters button[aria-pressed="true"] { color: #04121a; background: var(--acc); border-color: var(--acc); }
+
+  .alerts { display: grid; gap: 10px; }
+  .alert { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--sev); border-radius: 12px; overflow: hidden; opacity: 0; transform: translateX(-16px); transition: border-color .3s; }
+  .alert.in { animation: slide .55s cubic-bezier(.2,.8,.2,1) forwards; }
+  @keyframes slide { to { opacity: 1; transform: none; } }
+  .alert[hidden] { display: none; }
+  .alert > button { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 14px; }
+  .alert > button:focus-visible { outline: 2px solid var(--acc); outline-offset: -2px; border-radius: 10px; }
+  .sev { font: 600 10px "JetBrains Mono", monospace; letter-spacing: .08em; color: var(--sev); border: 1px solid var(--sev); border-radius: 5px; padding: 3px 6px; }
+  .alert h3 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.3; }
+  .alert p.src { margin: 2px 0 0; font: 400 11px "JetBrains Mono", monospace; color: var(--mute); }
+  .st { font: 600 10px "JetBrains Mono", monospace; color: var(--mute); text-align: right; white-space: nowrap; }
+  .alert.done .st { color: var(--low); }
+  .chev { display: inline-block; transition: transform .3s; }
+  .alert.open .chev { transform: rotate(90deg); }
+
+  .triage { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s cubic-bezier(.2,.8,.2,1); }
+  .alert.open .triage { grid-template-rows: 1fr; }
+  .triage > div { overflow: hidden; }
+  .tbody { padding: 0 14px 16px; border-top: 1px dashed var(--line); margin: 0 14px; padding-inline: 0; }
+  .prog { height: 3px; background: var(--line); border-radius: 2px; margin: 14px 0 12px; overflow: hidden; }
+  .prog i { display: block; height: 100%; width: 0; background: var(--acc); }
+  .alert.open .prog i { animation: load .9s cubic-bezier(.4,0,.2,1) forwards; }
+  @keyframes load { to { width: 100%; } }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 14px; }
+  .steps li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; opacity: 0; transform: translateY(6px); }
+  .alert.open .steps li { animation: rise .4s cubic-bezier(.2,.8,.2,1) forwards; }
+  .steps li::before { content: "›"; color: var(--acc); font-family: "JetBrains Mono", monospace; }
+  .tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .tools span { font: 400 11px "JetBrains Mono", monospace; padding: 4px 8px; border-radius: 6px; background: rgba(56,225,255,.08); color: var(--acc); }
+  .verdict { margin-top: 12px; font: 600 12px "JetBrains Mono", monospace; color: var(--low); }
+  .note { color: var(--mute); font-size: 12px; margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="demo-strip"><span>Demo A · SOC Console · preview only</span><a href="../">← All demos</a></div>
+
+<section class="hero">
+  <div class="grid" aria-hidden="true"></div>
+  <div class="scan" aria-hidden="true"></div>
+  <div class="bar"><span>SOC · Analyst console</span><span class="live"><i></i><span id="clock">--:--:-- UTC</span></span></div>
+
+  <div class="id">
+    <span class="tag">ANALYST · ON SHIFT</span>
+    <h1 aria-label="Roya Yarali"><span id="typed"></span><span class="caret" aria-hidden="true"></span></h1>
+    <p class="role"><b>Aspiring SOC Analyst.</b> Digital Forensics &amp; Cybersecurity student at BCIT, MSc in Information Technology.</p>
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><b data-to="3">0</b><span>Blue team labs solved on CyberDefenders</span></div>
+    <div class="tile"><b data-to="4">0</b><span>Attack patterns caught in a network lab</span></div>
+    <div class="tile"><b data-to="7">0</b><span>Windows artifact types examined</span></div>
+    <div class="tile"><b data-to="2015" data-from="2000">2000</b><span>Working in IT since</span></div>
+  </div>
+</section>
+
+<section class="queue">
+  <div class="qhead"><h2>Case queue</h2><small class="mono" id="count">4 cases</small></div>
+  <div class="filters" role="group" aria-label="Filter cases">
+    <button type="button" aria-pressed="true" data-f="all">All</button>
+    <button type="button" aria-pressed="false" data-f="net">Network</button>
+    <button type="button" aria-pressed="false" data-f="dfir">Forensics</button>
+    <button type="button" aria-pressed="false" data-f="cloud">Cloud</button>
+  </div>
+
+  <div class="alerts" id="alerts">
+    <article class="alert" data-k="net" style="--sev:var(--crit)">
+      <button type="button" aria-expanded="false"><span class="sev">CRIT</span><span><h3>Scans, a UDP flood and a reverse shell attempt</h3><p class="src">Network Security Lab · Linux</p></span><span class="st">TRIAGE <span class="chev">›</span></span></button>
+      <div class="triage"><div><div class="tbody">
+        <div class="prog"><i></i></div>
+        <ul class="steps">
+          <li>Captured and analyzed traffic in Wireshark</li>
+          <li>Picked out TCP FIN scans, XMAS scans, UDP flood traffic and reverse shell attempts</li>
+          <li>Wrote layered nftables rules to filter and block them</li>
+          <li>Checked that layered filtering caught and blocked the traffic in real time</li>
+        </ul>
+        <div class="tools"><span>Wireshark</span><span>nftables</span><span>hping3</span><span>Linux</span></div>
+        <div class="verdict">✓ CONTAINED · rules verified</div>
+      </div></div></div>
+    </article>
+
+    <article class="alert" data-k="dfir" style="--sev:var(--high)">
+      <button type="button" aria-expanded="false"><span class="sev">HIGH</span><span><h3>Reconstruct user activity on a Windows disk image</h3><p class="src">Windows Digital Forensics</p></span><span class="st">TRIAGE <span class="chev">›</span></span></button>
+      <div class="triage"><div><div class="tbody">
+        <div class="prog"><i></i></div>
+        <ul class="steps">
+          <li>Exported and hashed user documents to keep the evidence intact</li>
+          <li>Read Registry hives for OS version, install date, RID and SID values</li>
+          <li>Traced USB devices, Prefetch files and IE / Firefox browsing</li>
+          <li>Cross-checked Autopsy findings in Registry Explorer, then built a timeline</li>
+        </ul>
+        <div class="tools"><span>Autopsy</span><span>Registry Explorer</span><span>WinPrefetchView</span><span>Timeline analysis</span></div>
+        <div class="verdict">✓ CLOSED · report written</div>
+      </div></div></div>
+    </article>
+
+    <article class="alert" data-k="dfir net" style="--sev:var(--med)">
+      <button type="button" aria-expanded="false"><span class="sev">MED</span><span><h3>Three CyberDefenders blue team labs</h3><p class="src">PoisonedCredentials · Oski · WebStrike</p></span><span class="st">TRIAGE <span class="chev">›</span></span></button>
+      <div class="triage"><div><div class="tbody">
+        <div class="prog"><i></i></div>
+        <ul class="steps">
+          <li>PoisonedCredentials: completed</li>
+          <li>Oski: completed</li>
+          <li>WebStrike: completed</li>
+        </ul>
+        <div class="tools"><span>Blue team</span><span>DFIR</span><span>SOC</span></div>
+        <div class="verdict">✓ SOLVED · 3 of 3</div>
+      </div></div></div>
+    </article>
+
+    <article class="alert" data-k="cloud" style="--sev:var(--low)">
+      <button type="button" aria-expanded="false"><span class="sev">LOW</span><span><h3>Two AWS builds: a live web app and a cloud backend</h3><p class="src">Cloud · EC2 · RDS</p></span><span class="st">TRIAGE <span class="chev">›</span></span></button>
+      <div class="triage"><div><div class="tbody">
+        <div class="prog"><i></i></div>
+        <ul class="steps">
+          <li>Provisioned and managed an EC2 instance</li>
+          <li>Set up an Nginx reverse proxy and the domain's DNS</li>
+          <li>Turned on HTTPS with Let's Encrypt</li>
+          <li>Built a Flask API connected to a MySQL database on RDS</li>
+        </ul>
+        <div class="tools"><span>AWS EC2</span><span>RDS</span><span>Nginx</span><span>Flask</span><span>Let's Encrypt</span></div>
+        <div class="verdict">✓ LIVE · HTTPS on</div>
+      </div></div></div>
+    </article>
+  </div>
+  <p class="note">Tap a case to triage it. The full site would give each case its own page.</p>
+</section>
+
+<div class="demo-end">
+  <p>That's demo A. The full site would add a page per case, your experience, résumé and contact.</p>
+  <a href="../#q">Back to the questions →</a>
+</div>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Live UTC clock
+  const clock = document.getElementById('clock');
+  const tick = () => clock.textContent = new Date().toISOString().slice(11, 19) + ' UTC';
+  tick(); setInterval(tick, 1000);
+
+  // Type the name
+  const name = 'Roya Yarali', typed = document.getElementById('typed');
+  if (reduce) typed.textContent = name;
+  else [...name].forEach((c, i) => setTimeout(() => typed.textContent += c, 300 + i * 85));
+
+  // Count-up tiles
+  setTimeout(() => document.querySelectorAll('.tile b').forEach((b) => {
+    const to = +b.dataset.to, from = +(b.dataset.from || 0), t0 = performance.now(), dur = reduce ? 1 : 1100;
+    const step = (t) => { const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3); b.textContent = Math.round(from + (to - from) * e); if (p < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }), reduce ? 0 : 1700);
+
+  // Cases slide in when the queue scrolls into view
+  const alerts = [...document.querySelectorAll('.alert')];
+  const io = new IntersectionObserver(([e]) => {
+    if (!e.isIntersecting) return;
+    alerts.forEach((a, i) => setTimeout(() => a.classList.add('in'), i * 140));
+    io.disconnect();
+  }, { threshold: .15 });
+  io.observe(document.getElementById('alerts'));
+
+  // Triage (expand)
+  alerts.forEach((a) => {
+    const btn = a.querySelector('button');
+    a.querySelectorAll('.steps li').forEach((li, i) => li.style.animationDelay = (.5 + i * .12) + 's');
+    btn.addEventListener('click', () => {
+      const open = a.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open);
+      if (open) setTimeout(() => { a.classList.add('done'); a.querySelector('.st').innerHTML = 'CLOSED <span class="chev">›</span>'; }, reduce ? 0 : 900);
+    });
+  });
+
+  // Filters
+  const fbtns = [...document.querySelectorAll('.filters button')], count = document.getElementById('count');
+  fbtns.forEach((b) => b.addEventListener('click', () => {
+    fbtns.forEach((x) => x.setAttribute('aria-pressed', x === b));
+    const f = b.dataset.f; let n = 0;
+    alerts.forEach((a) => { const show = f === 'all' || a.dataset.k.split(' ').includes(f); a.hidden = !show; if (show) n++; });
+    count.textContent = n + (n === 1 ? ' case' : ' cases');
+  }));
+</script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Demo B — Case File</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#f3efe6">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/demo.css">
+<style>
+  :root { --bg:#f3efe6; --paper:#fbf8f1; --ink:#1c1b19; --mute:#7a756b; --line:#ddd5c4; --amber:#d98e04; --red:#c8322a; --ok:#1f8a5b;
+    --demo-cta-bg:#1c1b19; --demo-cta-ink:#fbf8f1; }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.55 Inter, system-ui, sans-serif; overflow-x: hidden; }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+  .hero { overflow: clip; padding: 64px 16px 40px; max-width: 760px; margin: 0 auto; }
+  .file { font: 600 11px "IBM Plex Mono", monospace; letter-spacing: .1em; color: var(--mute); display: flex; justify-content: space-between; gap: 10px; border-bottom: 1.5px solid var(--ink); padding-bottom: 10px; }
+  h1 { margin: 26px 0 6px; font: 900 clamp(56px, 18vw, 140px)/.86 Archivo, sans-serif; font-stretch: 70%; letter-spacing: -.02em; text-transform: uppercase; }
+  h1 .ln { display: block; overflow: hidden; }
+  h1 .ln > span { display: block; transform: translateY(105%); animation: up .9s cubic-bezier(.2,.8,.2,1) forwards; }
+  h1 .ln:nth-child(2) > span { animation-delay: .12s; color: var(--amber); }
+  @keyframes up { to { transform: none; } }
+  .sub { margin: 10px 0 0; color: var(--mute); max-width: 40ch; opacity: 0; animation: fade .8s .7s forwards; }
+  @keyframes fade { to { opacity: 1; } }
+
+  /* Evidence bag */
+  .bag { position: relative; margin-top: 30px; background: var(--paper); border: 1.5px solid var(--ink); border-radius: 4px; padding: 18px 16px 16px; box-shadow: 6px 6px 0 var(--ink); opacity: 0; transform: translateY(16px) rotate(-.6deg); animation: drop .8s .9s cubic-bezier(.2,.8,.2,1) forwards; }
+  @keyframes drop { to { opacity: 1; transform: rotate(-.6deg); } }
+  .bag::before { content: "EVIDENCE"; position: absolute; top: -11px; left: 14px; background: var(--amber); color: var(--ink); font: 700 11px "IBM Plex Mono", monospace; letter-spacing: .14em; padding: 3px 8px; }
+  .row { display: grid; grid-template-columns: 96px 1fr; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--line); font-size: 14px; }
+  .row:last-of-type { border-bottom: 0; }
+  .row dt { font: 600 11px "IBM Plex Mono", monospace; color: var(--mute); text-transform: uppercase; letter-spacing: .06em; padding-top: 2px; }
+  .row dd { margin: 0; min-width: 0; }
+  #hash { font: 400 12px/1.5 "IBM Plex Mono", monospace; word-break: break-all; color: var(--mute); }
+  #hash.ok { color: var(--ok); }
+  .verify { margin-top: 14px; width: 100%; min-height: 50px; border: 0; border-radius: 4px; background: var(--ink); color: var(--paper); font: 600 14px "IBM Plex Mono", monospace; letter-spacing: .04em; cursor: pointer; transition: transform .15s, background .3s; }
+  .verify:active { transform: scale(.98); }
+  .verify:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+  .verify[disabled] { cursor: default; }
+  .verify.ok { background: var(--ok); }
+  .stamp { position: absolute; right: 12px; top: 40px; font: 900 26px Archivo, sans-serif; font-stretch: 75%; letter-spacing: .06em; color: var(--red); border: 3px solid var(--red); border-radius: 6px; padding: 2px 10px; transform: rotate(-12deg) scale(2.2); opacity: 0; pointer-events: none; mix-blend-mode: multiply; }
+  .stamp.on { animation: stamp .45s cubic-bezier(.3,1.6,.5,1) forwards; }
+  @keyframes stamp { to { opacity: .85; transform: rotate(-12deg) scale(1); } }
+
+  /* Timeline */
+  .tl { max-width: 760px; margin: 0 auto; padding: 50px 16px 30px; }
+  .tl header { display: flex; justify-content: space-between; align-items: end; gap: 12px; border-bottom: 1.5px solid var(--ink); padding-bottom: 10px; }
+  .tl h2 { margin: 0; font: 900 clamp(34px, 10vw, 60px)/.9 Archivo, sans-serif; font-stretch: 70%; text-transform: uppercase; }
+  .tl header small { font: 600 11px "IBM Plex Mono", monospace; color: var(--mute); text-align: right; }
+  .evwrap { position: relative; }
+  .events { list-style: none; margin: 0; padding: 22px 0 0 26px; }
+  .track, .fill { position: absolute; left: 7px; top: 22px; bottom: 0; width: 2px; }
+  .track { background: var(--line); }
+  .fill { background: var(--ink); transform-origin: top; transform: scaleY(var(--p, 0)); }
+  .ev { position: relative; padding: 0 0 22px; opacity: .18; transition: opacity .5s; }
+  .ev.on { opacity: 1; }
+  .ev::before { content: ""; position: absolute; left: -24px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--bg); border: 2px solid var(--ink); transition: background .3s; }
+  .ev.on::before { background: var(--c, var(--ink)); }
+  .ev[data-t="edu"] { --c: var(--amber); } .ev[data-t="job"] { --c: var(--ink); } .ev[data-t="lab"] { --c: var(--red); } .ev[data-t="now"] { --c: var(--ok); }
+  .ev button { all: unset; box-sizing: border-box; display: block; width: 100%; cursor: pointer; border-radius: 4px; }
+  .ev button:focus-visible { outline: 2px solid var(--amber); outline-offset: 4px; }
+  .when { font: 600 12px "IBM Plex Mono", monospace; color: var(--mute); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .src { font: 600 10px "IBM Plex Mono", monospace; letter-spacing: .08em; text-transform: uppercase; padding: 2px 6px; border: 1px solid currentColor; border-radius: 3px; color: var(--c); }
+  .ev[data-t="job"] .src { color: var(--mute); }
+  .ev h3 { margin: 4px 0 0; font: 700 18px/1.25 Inter, sans-serif; letter-spacing: -.01em; }
+  .ev .at { display: block; color: var(--mute); font-size: 14px; }
+  .ev .more { font: 600 11px "IBM Plex Mono", monospace; color: var(--amber); margin-top: 4px; display: block; }
+  .detail { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s cubic-bezier(.2,.8,.2,1); }
+  .ev.open .detail { grid-template-rows: 1fr; }
+  .detail > div { overflow: hidden; }
+  .detail ul { margin: 8px 0 0; padding: 10px 12px 10px 28px; background: var(--paper); border: 1px solid var(--line); border-radius: 4px; font-size: 14px; }
+  .detail li + li { margin-top: 4px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 18px; font: 600 11px "IBM Plex Mono", monospace; color: var(--mute); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+</style>
+</head>
+<body>
+<div class="demo-strip"><span>Demo B · Case File · preview only</span><a href="../">← All demos</a></div>
+
+<section class="hero">
+  <div class="file"><span>CASE FILE · RY-001</span><span>DFIR · BLUE TEAM</span></div>
+  <h1 aria-label="Roya Yarali"><span class="ln"><span>Roya</span></span><span class="ln"><span>Yarali</span></span></h1>
+  <p class="sub">Aspiring SOC Analyst. Forensic Investigation student at BCIT, MSc in Information Technology.</p>
+
+  <div class="bag">
+    <dl style="margin:0">
+      <div class="row"><dt>Item</dt><dd class="mono">roya_yarali.E01</dd></div>
+      <div class="row"><dt>Focus</dt><dd>Digital forensics · Incident response · Network security</dd></div>
+      <div class="row"><dt>Tools</dt><dd>Autopsy · Registry Explorer · Wireshark · nftables · Linux</dd></div>
+      <div class="row"><dt>SHA-256</dt><dd id="hash">not verified yet</dd></div>
+    </dl>
+    <button class="verify" id="verify" type="button">▶ Verify integrity</button>
+    <div class="stamp" id="stamp" aria-hidden="true">VERIFIED</div>
+  </div>
+</section>
+
+<section class="tl">
+  <header><h2>Timeline<br>rebuilt</h2><small>Tap an entry<br>to examine it</small></header>
+  <div class="evwrap"><span class="track" aria-hidden="true"></span><span class="fill" id="fill" aria-hidden="true"></span>
+  <ol class="events" id="events">
+
+    <li class="ev" data-t="edu"><button type="button" aria-expanded="false">
+      <span class="when">2009 – 2013 <span class="src">education</span></span>
+      <h3>Information Technology</h3><span class="at">University of Isfahan</span></button></li>
+
+    <li class="ev" data-t="edu"><button type="button" aria-expanded="false">
+      <span class="when">2014 – 2016 <span class="src">education</span></span>
+      <h3>Master's Degree, Information Technology</h3><span class="at">Safahan Institute of Higher Education</span></button></li>
+
+    <li class="ev" data-t="job"><button type="button" aria-expanded="false">
+      <span class="when">2015 – 2019 <span class="src">employment</span></span>
+      <h3>Information Technology Specialist</h3><span class="at">Ghazaei Electronic Services</span><span class="more">+ examine</span></button>
+      <div class="detail"><div><ul>
+        <li>Troubleshooting, maintenance and support across many user setups</li>
+        <li>Backup, recovery and data preservation</li>
+        <li>Handled sensitive customer data and kept it confidential</li>
+        <li>Wrote structured technical reports</li>
+      </ul></div></div></li>
+
+    <li class="ev" data-t="job"><button type="button" aria-expanded="false">
+      <span class="when">2018 – 2019 <span class="src">employment</span></span>
+      <h3>System Security Assistant</h3><span class="at">Ziaerizi Goldsmith</span><span class="more">+ examine</span></button>
+      <div class="detail"><div><ul>
+        <li>Monitored system access and user-level security controls</li>
+        <li>Flagged unauthorized activity and basic vulnerabilities</li>
+        <li>Supported secure backups and data protection</li>
+      </ul></div></div></li>
+
+    <li class="ev" data-t="job"><button type="button" aria-expanded="false">
+      <span class="when">2019 – 2021 <span class="src">employment</span></span>
+      <h3>Network Technician (IT Specialist)</h3><span class="at">Sitra Kitchen Accessories</span><span class="more">+ examine</span></button>
+      <div class="detail"><div><ul>
+        <li>Installed and configured routers, switches and network infrastructure</li>
+        <li>Set up basic network security and kept connections stable</li>
+        <li>Troubleshooting and system documentation</li>
+      </ul></div></div></li>
+
+    <li class="ev" data-t="edu"><button type="button" aria-expanded="false">
+      <span class="when">2025 → now <span class="src">education</span></span>
+      <h3>Bachelor's, Forensic Investigation: Digital Forensics &amp; Cybersecurity</h3><span class="at">British Columbia Institute of Technology</span></button></li>
+
+    <li class="ev" data-t="lab"><button type="button" aria-expanded="false">
+      <span class="when">2026 <span class="src">lab</span></span>
+      <h3>Three CyberDefenders blue team labs</h3><span class="at">PoisonedCredentials · Oski · WebStrike</span></button></li>
+
+    <li class="ev" data-t="lab"><button type="button" aria-expanded="false">
+      <span class="when">2026 <span class="src">lab</span></span>
+      <h3>Network Security Lab</h3><span class="at">Wireshark · hping3 · nftables</span><span class="more">+ examine</span></button>
+      <div class="detail"><div><ul>
+        <li>Analyzed TCP FIN scans, XMAS scans, UDP floods and reverse shell attempts</li>
+        <li>Blocked them with layered nftables firewall rules</li>
+      </ul></div></div></li>
+
+    <li class="ev" data-t="lab"><button type="button" aria-expanded="false">
+      <span class="when">2026 <span class="src">lab</span></span>
+      <h3>Windows Digital Forensics Investigation</h3><span class="at">Autopsy · Registry Explorer · WinPrefetchView</span><span class="more">+ examine</span></button>
+      <div class="detail"><div><ul>
+        <li>Hashed exported documents to keep the evidence intact</li>
+        <li>Registry, USB, Prefetch and browser artifacts</li>
+        <li>Cross-checked tools, then rebuilt a timeline of user activity</li>
+      </ul></div></div></li>
+
+    <li class="ev" data-t="now"><button type="button" aria-expanded="false">
+      <span class="when">NEXT <span class="src">pending</span></span>
+      <h3>SOC Analyst role</h3><span class="at">Next entry: your team?</span></button></li>
+  </ol></div>
+  <div class="legend"><span><i style="background:var(--amber)"></i>Education</span><span><i style="background:var(--ink)"></i>Work</span><span><i style="background:var(--red)"></i>Labs</span></div>
+</section>
+
+<div class="demo-end">
+  <p>That's demo B. The full site would add a full case report for each lab, résumé and contact.</p>
+  <a href="../#q">Back to the questions →</a>
+</div>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Hash "verification": a real SHA-256 of the item name, revealed after a scramble
+  const btn = document.getElementById('verify'), out = document.getElementById('hash'), stamp = document.getElementById('stamp');
+  btn.addEventListener('click', async () => {
+    btn.disabled = true; btn.textContent = 'Hashing…';
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('roya_yarali.E01'));
+    const hex = [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    const t0 = performance.now(), dur = reduce ? 0 : 1100, abc = '0123456789abcdef';
+    const step = (t) => {
+      const p = dur ? Math.min(1, (t - t0) / dur) : 1, fixed = Math.floor(p * hex.length);
+      out.textContent = hex.slice(0, fixed) + [...hex.slice(fixed)].map(() => abc[Math.random() * 16 | 0]).join('');
+      if (p < 1) return requestAnimationFrame(step);
+      out.classList.add('ok');
+      btn.classList.add('ok'); btn.textContent = '✓ Match · evidence intact';
+      stamp.classList.add('on');
+    };
+    requestAnimationFrame(step);
+  });
+
+  // Timeline: line fills with scroll, entries light up as the line reaches them
+  const list = document.getElementById('events'), fill = document.getElementById('fill'), evs = [...list.querySelectorAll('.ev')];
+  let ticking = false;
+  function onScroll() {
+    const r = list.getBoundingClientRect(), mark = innerHeight * .7;
+    const p = Math.min(1, Math.max(0, (mark - r.top) / r.height));
+    fill.style.setProperty('--p', p);
+    evs.forEach((ev) => ev.classList.toggle('on', ev.getBoundingClientRect().top < mark));
+    ticking = false;
+  }
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  addEventListener('resize', onScroll);
+  onScroll();
+
+  // Examine entries
+  evs.forEach((ev) => {
+    const b = ev.querySelector('button'), more = ev.querySelector('.more');
+    if (!ev.querySelector('.detail')) { b.removeAttribute('aria-expanded'); b.style.cursor = 'default'; b.tabIndex = -1; return; }
+    b.addEventListener('click', () => {
+      const open = ev.classList.toggle('open');
+      b.setAttribute('aria-expanded', open);
+      more.textContent = open ? '− close' : '+ examine';
+    });
+  });
+</script>
+</body>
+</html>
